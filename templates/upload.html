@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Math Solver - Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .upload-container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .upload-area:hover {
+            background: rgba(108, 99, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            animation: iconPulse 2s infinite;
+        }
+
+        #solution {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(16, 33, 65, 0.5);
+            border-radius: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .processing {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(108, 99, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @media (max-width: 768px) {
+            .upload-container {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="floating-particles" id="particles"></div>
+    
+    <a href="/" class="back-button">← Back</a>
+
+    <div class="hero-section">
+        <div class="upload-container">
+            <h1 class="title">Upload Math Problem</h1>
+            <div class="upload-area" id="dropZone">
+                <div class="upload-icon">📤</div>
+                <p>Drag and drop your image here or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <div class="processing" id="processingIndicator">
+                <div class="loading-spinner"></div>
+                <p>Processing your image...</p>
+            </div>
+
+            <div id="solution"></div>
+        </div>
+    </div>
+
+    <script>
+        // Create particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 20}s`;
+            particlesContainer.appendChild(particle);
+        }
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const solutionDiv = document.getElementById('solution');
+        const processingIndicator = document.getElementById('processingIndicator');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = 'rgba(108, 99, 255, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = 'transparent';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = 'transparent';
+            const file = e.dataTransfer.files[0];
+            if (file) processImage(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processImage(file);
+        });
+
+        async function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    processingIndicator.style.display = 'block';
+                    solutionDiv.style.display = 'none';
+                    
+                    const response = await fetch('/process-frame', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ image: e.target.result })
+                    });
+                    
+                    const data = await response.json();
+                    processingIndicator.style.display = 'none';
+                    
+                    if (data.error) {
+                        solutionDiv.style.display = 'block';
+                        solutionDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                    } else {
+                        solutionDiv.style.display = 'block';
+                        solutionDiv.innerHTML = data.solution.replace(/\n/g, '<br>');
+                        
+                        if (data.hasAudio) {
+                            const audio = new Audio(`/static/${data.audioFile}`);
+                            await audio.play();
+                        }
+                    }
+                } catch (err) {
+                    processingIndicator.style.display = 'none';
+                    solutionDiv.style.display = 'block';
+                    solutionDiv.innerHTML = '<p class="error">Error processing image</p>';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Result</title>
+</head>
+<body>
+    <h1>Extracted Text</h1>
+    <textarea readonly>{{ text }}</textarea>
+    <h2>Listen to the Answer</h2>
+    <audio controls>
+        <source src="{{ url_for('uploaded_file', filename=audio_file) }}" type="audio/mpeg">
+    </audio>
+    <a href="/">Back to Home</a>
+</body>
+</html>

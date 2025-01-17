@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Math Solver</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #4CAF50;
+            --danger-color: #f44336;
+            --background: #0a192f;
+            --card-bg: rgba(16, 33, 65, 0.9);
+            --text-primary: #E6F1FF;
+            --text-secondary: #8892B0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 40%);
+        }
+
+        .header {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(180deg, var(--card-bg) 0%, transparent 100%);
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .video-section, .solution-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .video-section:hover, .solution-section:hover {
+            transform: translateY(-5px);
+        }
+
+        #videoContainer {
+            width: 640px;
+            height: 480px;
+            border-radius: 15px;
+            background: #000;
+            border: 2px solid rgba(108, 99, 255, 0.2);
+        }
+
+        #solution {
+            width: 100%;
+            min-height: 480px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(16, 33, 65, 0.5);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            white-space: pre-line;
+            overflow-y: auto;
+            border: 2px solid rgba(108, 99, 255, 0.2);
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        button:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        #startBtn {
+            background: var(--primary-color);
+        }
+
+        #pauseBtn {
+            background: var(--danger-color);
+        }
+
+        #nextBtn {
+            background: var(--secondary-color);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .processing-indicator {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(16, 33, 65, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 20px;
+        }
+
+        .loading div {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: loading 1.2s linear infinite;
+        }
+
+        .loading div:nth-child(1) {
+            animation-delay: 0s;
+            left: 8px;
+        }
+
+        .loading div:nth-child(2) {
+            animation-delay: 0.2s;
+            left: 32px;
+        }
+
+        .loading div:nth-child(3) {
+            animation-delay: 0.4s;
+            left: 56px;
+        }
+
+        @keyframes loading {
+            0% { transform: scale(0); }
+            50% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+
+        /* Add debug styling */
+        .debug-info {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Math Solver</h1>
+    </div>
+    
+    <div class="container">
+        <div class="video-section">
+            <video id="videoContainer" autoplay></video>
+            <canvas id="canvas"></canvas>
+            <div class="controls">
+                <button id="startBtn" class="btn-primary">Start Processing</button>
+                <button id="pauseBtn" class="btn-secondary" disabled>Pause</button>
+                <button id="nextBtn" class="btn-next" disabled>Next Question</button>
+            </div>
+            <div class="processing-indicator" id="status">
+                Camera ready
+                <div class="loading">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <div class="solution-section">
+            <div id="solution"></div>
+            <div class="debug-info" id="debugInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('videoContainer');
+        let canvas = document.getElementById('canvas');
+        let solutionDiv = document.getElementById('solution');
+        let startBtn = document.getElementById('startBtn');
+        let pauseBtn = document.getElementById('pauseBtn');
+        let nextBtn = document.getElementById('nextBtn');
+        let statusDiv = document.getElementById('status');
+        
+        let isProcessing = false;
+        let processingInterval;
+        let currentAudio = null;
+        let lastProcessingTime = 0;
+        const PROCESSING_COOLDOWN = 1500; // 1.5 seconds cooldown
+
+        async function startVideo() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                statusDiv.textContent = "Error accessing camera";
+            }
+        }
+
+        async function processFrame() {
+            const now = Date.now();
+            if (isProcessing || now - lastProcessingTime < PROCESSING_COOLDOWN) return;
+            
+            lastProcessingTime = now;
+            isProcessing = true;
+            statusDiv.textContent = "Processing...";
+            
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const base64Image = canvas.toDataURL('image/jpeg');
+
+            try {
+                console.log("Sending image to server...");
+                const response = await fetch('/process-frame', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: base64Image })
+                });
+                
+                const data = await response.json();
+                console.log("Server response:", data);  // Debug log
+                
+                if (data.error) {
+                    console.error("Server error:", data.error);
+                    statusDiv.textContent = `Error: ${data.error}`;
+                } else if (data.solution !== "No text detected in the image" && 
+                          data.solution !== "No valid math problem detected") {
+                    // Stop processing when solution is found
+                    pauseProcessing();
+                    
+                    // Display solution with formatting
+                    console.log("Displaying solution:", data.solution);
+                    solutionDiv.innerHTML = data.solution.replace(/\n/g, '<br>');
+                    statusDiv.textContent = "Solution found!";
+                    
+                    // Play audio if available
+                    if (data.hasAudio && data.audioFile) {
+                        console.log("Playing audio:", data.audioFile);
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio = null;
+                        }
+                        try {
+                            currentAudio = new Audio(`/static/${data.audioFile}`);
+                            currentAudio.onerror = (e) => console.error("Audio error:", e);
+                            currentAudio.onloadeddata = () => console.log("Audio loaded successfully");
+                            await currentAudio.play().catch(e => console.error("Audio playback error:", e));
+                            console.log("Audio playback started");
+                        } catch (audioErr) {
+                            console.error("Audio playback error:", audioErr);
+                        }
+                    } else {
+                        console.log("No audio available in response");
+                    }
+                    
+                    nextBtn.disabled = false;
+                } else {
+                    console.log("No valid solution found in image");
+                }
+            } catch (err) {
+                console.error("Error processing frame:", err);
+                statusDiv.textContent = "Error processing image";
+            }
+
+            isProcessing = false;
+        }
+
+        function startProcessing() {
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            nextBtn.disabled = true;
+            statusDiv.textContent = "Processing video...";
+            processingInterval = setInterval(processFrame, 2000);  // Increased to 2 seconds
+        }
+
+        function pauseProcessing() {
+            clearInterval(processingInterval);
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            statusDiv.textContent = "Processing paused";
+        }
+
+        function nextQuestion() {
+            solutionDiv.textContent = "";
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            nextBtn.disabled = true;
+            startProcessing();
+        }
+
+        startBtn.addEventListener('click', startProcessing);
+        pauseBtn.addEventListener('click', pauseProcessing);
+        nextBtn.addEventListener('click', nextQuestion);
+
+        // Initial setup
+        startVideo();
+
+        // Hide the debug canvas
+        canvas.style.display = 'none';
+    </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Math Solver - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #4CAF50;
+            --background: #0a192f;
+            --card-bg: rgba(16, 33, 65, 0.9);
+            --text-primary: #E6F1FF;
+            --text-secondary: #8892B0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--background);
+            color: var(--text-primary);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(108, 99, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 85% 85%, rgba(76, 175, 80, 0.1) 0%, transparent 50%);
+            animation: starFloat 20s infinite linear;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title-container {
+            margin-bottom: 4rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleFloat 3s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .project-info {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideUp 1s ease-out;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .project-info:hover {
+            transform: translateY(-5px);
+        }
+
+        .options {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+            animation: fadeInUp 1s ease-out 0.5s backwards;
+        }
+
+        .option-card {
+            width: 300px;
+            height: 400px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .option-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .option-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .option-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: iconPulse 2s infinite;
+        }
+
+        .option-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .option-description {
+            text-align: center;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: particleFloat 20s infinite linear;
+        }
+
+        .creator-info {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease-out 1s backwards;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .options {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .option-card {
+                width: 100%;
+                max-width: 300px;
+                height: auto;
+                min-height: 300px;
+            }
+
+            .project-info {
+                margin: 1rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="hero-section">
+        <div class="title-container">
+            <h1 class="title">AI Math Solver</h1>
+            <p class="subtitle">Your Smart Math Assistant</p>
+        </div>
+
+        <div class="project-info">
+            <h2>About This Project</h2>
+            <p>Welcome to my first weekly project! This AI-powered Math Solver combines computer vision, artificial intelligence, and speech synthesis to help solve mathematical problems in real-time.</p>
+            <p>Using advanced OCR technology and the power of AI, this tool can:</p>
+            <ul>
+                <li>Recognize mathematical expressions from images</li>
+                <li>Provide step-by-step solutions</li>
+                <li>Explain the solution through natural speech</li>
+                <li>Support both image upload and real-time camera input</li>
+            </ul>
+            <p>Built with Python, Flask, and modern web technologies, this project showcases the potential of AI in education.</p>
+        </div>
+
+        <div class="options">
+            <a href="/upload" class="option-card">
+                <div class="option-icon">📷</div>
+                <h2 class="option-title">Upload Photo</h2>
+                <p class="option-description">Upload an image of your math problem and get instant step-by-step solutions</p>
+            </a>
+            <a href="/live" class="option-card">
+                <div class="option-icon">🎥</div>
+                <h2 class="option-title">Live Solve</h2>
+                <p class="option-description">Solve math problems in real-time using your camera</p>
+            </a>
+        </div>
+
+        <div class="creator-info">
+            Created by Ashok • First Weekly Project
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 20}s`;
+            particlesContainer.appendChild(particle);
+        }
+
+        // Add hover effect to project info
+        document.querySelector('.project-info').addEventListener('mousemove', (e) => {
+            const { left, top, width, height } = e.target.getBoundingClientRect();
+            const x = (e.clientX - left) / width;
+            const y = (e.clientY - top) / height;
+            
+            e.target.style.transform = `
+                perspective(1000px)
+                rotateX(${(y - 0.5) * 10}deg)
+                rotateY(${(x - 0.5) * 10}deg)
+                translateZ(20px)
+            `;
+        });
+
+        document.querySelector('.project-info').addEventListener('mouseleave', (e) => {
+            e.target.style.transform = 'none';
+        });
+    </script>
+</body>
+</html> 
